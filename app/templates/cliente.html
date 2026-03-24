@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://public-frontend-cos.metadl.com/mgx/img/favicon_atoms.ico" type="image/x-icon">
+    <title>Chat - Portal del Cliente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente.css') }}">
+</head>
+
+<body>
+
+    <!-- ==================== VISTA PRINCIPAL: USUARIOS ==================== -->
+    <div id="app-convenios" class="view active">
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                    <span class="logo-text">Convenios Aquarium</span>
+                </div>
+
+                <nav class="nav">
+                    <a href="#" class="nav-link active">Inicio</a>
+                    <a href="#" class="nav-link">Chats</a>
+                    <a href="#" class="nav-link">Ayuda</a>
+
+                    <button class="btn-logout" onclick="cerrarSesion()">
+                        Cerrar Sesión
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Consulta Nuestros Convenios</h1>
+                <p class="hero-subtitle">
+                    Indicanos en que te podemos ayudar ¡Estamos a tu Servicio!
+                </p>
+            </div>
+        </section>
+
+        <!-- LISTA DE USUARIOS -->
+        <section class="convenios-section">
+            <div style="max-width: 600px; margin: auto;">
+
+                <div id="lista-usuarios" style="
+                    background: #fff;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                ">
+                    <!-- Se llena con JS -->
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ==================== VISTA CHAT ==================== -->
+    <div id="app-chat" class="view">
+
+        <!-- Header -->
+        <div class="chat-header">
+            <button class="btn-back" onclick="closeChat()">
+                ← Volver
+            </button>
+
+            <div class="chat-header-info">
+                <h3 class="chat-title" id="chat-title">Usuario</h3>
+                <span class="chat-status">
+                    <span class="status-dot"></span>
+                    En línea
+                </span>
+            </div>
+        </div>
+
+        <!-- Mensajes -->
+        <div class="chat-messages" id="chat-messages"></div>
+
+        <!-- Input -->
+        <div class="chat-input-area">
+            <div class="chat-input-wrapper">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Escribe tu mensaje...">
+                <button class="btn-send" onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ==================== USER SESSION ==================== -->
+    <script>
+        const CURRENT_USER_ID = "{{ session['id'] }}";
+    </script>
+
+    <!-- ==================== JS ==================== -->
+    <script src="{{ url_for('static', filename='js/cliente.js') }}"></script>
+
+</body>
+
+</html>
