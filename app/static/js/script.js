@@ -290,38 +290,63 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ========== REGISTER FORM SUBMIT ==========
-    if (registerForm) {
-        registerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-            const nombre = document.getElementById('regNombre').value;
-            const email = document.getElementById('regEmail').value;
-            const password = regPasswordInput.value;
-            const confirmPassword = regConfirmPasswordInput.value;
+        const nombre = document.getElementById('regNombre').value;
+        const email = document.getElementById('regEmail').value;
+        const password = regPasswordInput.value;
+        const confirmPassword = regConfirmPasswordInput.value;
 
-            // Validate passwords match
-            if (password !== confirmPassword) {
-                regConfirmPasswordInput.classList.add('input-error');
-                regConfirmPasswordInput.classList.remove('input-success');
+        if (password !== confirmPassword) {
+            alert("Las contraseñas no coinciden");
+            return;
+        }
 
-                // Show a temporary error
-                let errorEl = regConfirmPasswordInput.closest('.form-group').querySelector('.form-error');
-                if (!errorEl) {
-                    errorEl = document.createElement('div');
-                    errorEl.className = 'form-error visible';
-                    errorEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Las contraseñas no coinciden';
-                    regConfirmPasswordInput.closest('.form-group').appendChild(errorEl);
-                } else {
-                    errorEl.classList.add('visible');
-                }
+        if (password.length < 8) {
+            alert("La contraseña debe tener mínimo 8 caracteres");
+            return;
+        }
 
-                setTimeout(() => {
-                    regConfirmPasswordInput.classList.remove('input-error');
-                    if (errorEl) errorEl.classList.remove('visible');
-                }, 3000);
+        const btn = registerForm.querySelector('.btn');
+        const originalContent = btn.innerHTML;
 
-                return;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando cuenta...';
+        btn.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append("nombre", nombre);
+            formData.append("email", email);
+            formData.append("password", password);
+
+            const res = await fetch("/auth/register", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("Usuario registrado correctamente");
+
+                closeModal(registerModal);
+                registerForm.reset();
+
+            } else {
+                alert(data.error || "Error al registrar");
             }
+
+        } catch (error) {
+            console.error(error);
+            alert("Error de conexión");
+        }
+
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+    });
+}
 
             // Validate password strength
             if (password.length < 8) {
