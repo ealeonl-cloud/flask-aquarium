@@ -26,7 +26,7 @@ def get_users():
     user_id = session['id']
 
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT id, nombre FROM usuarios WHERE rol ="usuario" and id != %s", (user_id,))
+    cursor.execute("SELECT id, nombre FROM usuarios WHERE rol = 'usuario' AND id != %s", (user_id,))
     usuarios = cursor.fetchall()
     cursor.close()
 
