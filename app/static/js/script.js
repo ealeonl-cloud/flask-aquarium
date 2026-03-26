@@ -494,6 +494,15 @@ if (registerForm) {
     });
 
 
+    // ========== CONDICION DE CERRADO ==========
+
+const params = new URLSearchParams(window.location.search);
+
+if (params.get("login") === "1") {
+    openModal(loginModal);
+}
+
+
     // Initial calls
     revealOnScroll();
     animateCounters();
