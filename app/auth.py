@@ -12,7 +12,7 @@ def init_mysql(db):
 
 @auth.route('/login')
 def login_page():
-    return render_template("index.html")
+    return redirect(url_for('index', login='1'))
 
 
 from flask import jsonify
