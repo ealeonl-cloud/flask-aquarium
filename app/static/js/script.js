@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
             formData.append("email", email);
             formData.append("password", password);
 
-            const res = await fetch("/auth/login", {
+            const res = await fetch("/login", {
                 method: "POST",
                 body: formData
             });
@@ -321,7 +321,7 @@ if (registerForm) {
             formData.append("email", email);
             formData.append("password", password);
 
-            const res = await fetch("/auth/register", {
+            const res = await fetch("/register", {
                 method: "POST",
                 body: formData
             });
