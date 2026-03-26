@@ -15,6 +15,8 @@ def login_page():
     return render_template("login.html")
 
 
+from flask import jsonify
+
 @auth.route('/login', methods=['POST'])
 def login():
 
@@ -22,7 +24,6 @@ def login():
     password = request.form['password']
 
     cursor = mysql.connection.cursor()
-
     cursor.execute(
         "SELECT id, nombre, email, password, rol FROM usuarios WHERE email=%s",
         (email,)
@@ -38,9 +39,9 @@ def login():
         session['email'] = usuario[2]
         session['rol'] = usuario[4]
 
-        return redirect(url_for('dashboard'))
+        return jsonify({"success": True})
 
-    return "Correo o contraseña incorrectos"
+    return jsonify({"error": "Correo o contraseña incorrectos"}), 401
 
 
 @auth.route('/register', methods=['POST'])
