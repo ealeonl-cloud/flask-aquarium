@@ -43,6 +43,40 @@ def login():
     return "Correo o contraseña incorrectos"
 
 
+@auth.route('/register', methods=['POST'])
+def register():
+    try:
+        nombre = request.form['nombre']
+        email = request.form['email']
+        password = request.form['password']
+
+        rol = "usuario"
+        fecha_creacion = datetime.now()
+
+        cursor = mysql.connection.cursor()
+
+        # Validar si ya existe el email
+        cursor.execute("SELECT id FROM usuarios WHERE email = %s", (email,))
+        existe = cursor.fetchone()
+
+        if existe:
+            return jsonify({"error": "El correo ya está registrado"}), 400
+
+        # Insertar usuario
+        cursor.execute("""
+            INSERT INTO usuarios (nombre, email, password, fecha_creacion, rol)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (nombre, email, password, fecha_creacion, rol))
+
+        mysql.connection.commit()
+        cursor.close()
+
+        return jsonify({"mensaje": "Usuario registrado correctamente"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @auth.route('/logout')
 def logout():
 
