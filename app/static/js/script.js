@@ -247,25 +247,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ========== LOGIN FORM SUBMIT ==========
     if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-            const email = document.getElementById('loginEmail').value;
-            const btn = loginForm.querySelector('.btn');
-            const originalContent = btn.innerHTML;
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
-            btn.disabled = true;
+        const btn = loginForm.querySelector('.btn');
+        const originalContent = btn.innerHTML;
 
-            setTimeout(() => {
-                alert(`Inicio de sesión simulado.\nCorreo: ${email}`);
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
-                closeModal(loginModal);
-                loginForm.reset();
-            }, 1500);
-        });
-    }
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+        btn.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append("email", email);
+            formData.append("password", password);
+
+            const res = await fetch("/auth/login", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                // Redirección según rol
+                window.location.href = "/dashboard";
+            } else {
+                alert(data.error || "Error al iniciar sesión");
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("Error de conexión");
+        }
+
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+    });
+}
 
 
     // ========== REGISTER FORM SUBMIT ==========
@@ -315,19 +336,59 @@ document.addEventListener("DOMContentLoaded", function () {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando cuenta...';
             btn.disabled = true;
 
-            setTimeout(() => {
-                alert(`Registro simulado exitoso.\nNombre: ${nombre}\nCorreo: ${email}`);
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
+            if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nombre = document.getElementById('regNombre').value;
+        const email = document.getElementById('regEmail').value;
+        const password = regPasswordInput.value;
+        const confirmPassword = regConfirmPasswordInput.value;
+
+        if (password !== confirmPassword) {
+            alert("Las contraseñas no coinciden");
+            return;
+        }
+
+        const btn = registerForm.querySelector('.btn');
+        const originalContent = btn.innerHTML;
+
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando cuenta...';
+        btn.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append("nombre", nombre);
+            formData.append("email", email);
+            formData.append("password", password);
+
+            const res = await fetch("/auth/register", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("Usuario registrado correctamente");
+
                 closeModal(registerModal);
                 registerForm.reset();
-                if (passwordStrength) {
-                    passwordStrength.classList.remove('active');
-                    updateStrengthUI(0);
-                }
-            }, 1500);
-        });
-    }
+
+            } else {
+                alert(data.error || "Error al registrar");
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("Error de conexión");
+        }
+
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+    });
+}
+
 
     // Real-time confirm password validation
     if (regConfirmPasswordInput && regPasswordInput) {
