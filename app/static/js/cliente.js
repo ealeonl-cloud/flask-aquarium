@@ -394,7 +394,7 @@ function startPolling() {
         if (currentChatUser && document.visibilityState === "visible") {
             cargarMensajes();
         }
-    }, 6500000);
+    }, 3000);
 }
 
 function stopPolling() {
