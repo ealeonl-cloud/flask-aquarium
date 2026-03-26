@@ -52,7 +52,6 @@ def register():
         password = request.form['password']
 
         rol = "usuario"
-        fecha_creacion = datetime.now()
 
         cursor = mysql.connection.cursor()
 
