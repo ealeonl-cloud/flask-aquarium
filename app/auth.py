@@ -65,9 +65,9 @@ def register():
 
         # Insertar usuario
         cursor.execute("""
-            INSERT INTO usuarios (nombre, email, password, fecha_creacion, rol)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (nombre, email, password, fecha_creacion, rol))
+        INSERT INTO usuarios (nombre, email, password, rol)
+        VALUES (%s, %s, %s, %s)
+        """, (nombre, email, password, rol))
 
         mysql.connection.commit()
         cursor.close()
