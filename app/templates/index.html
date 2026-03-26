@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://public-frontend-cos.metadl.com/mgx/img/favicon_atoms.ico" type="image/x-icon">
     <title>AQUARIUM</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="#inicio" class="nav-logo">
-                <i class=""></i>
+                <i class="fas fa-water"></i>
                 <span>AQUARIUM</span>
             </a>
             <ul class="nav-menu" id="navMenu">
@@ -251,7 +251,7 @@
             <div class="footer-grid">
                 <div class="footer-col">
                     <div class="footer-logo">
-                        <i class="fas fa-graduation-cap"></i>
+                        <i class="fas fa-water"></i>
                         <span>AQUARIUM</span>
                     </div>
                     <p class="footer-desc">Buscando Soluciones para ser mejores.</p>
@@ -276,7 +276,8 @@
                     <ul class="footer-contact">
                         <li><i class="fas fa-map-marker-alt"></i> Tv 27 M #71 P 55 sur - Bogota, Colombia</li>
                         <li><i class="fas fa-phone"></i> +57 3004091360</li>
-                        <li><i class="fas fa-envelope"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bed7d0d8d1fed8dbd990dbdacb">ealeonl@sanmateo.edu.co, masuarezotalora@sanmateo.edu.co</a></li>
+                        <li><i class="fas fa-envelope"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d4b1b5b8b1bbbab894a7b5bab9b5a0b1bbfab1b0a1fab7bb">[email&#160;protected]</a></li>
+                        <li><i class="fas fa-envelope"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="54393527213526312e3b2035383b26351427353a393520313b7a3130217a373b">[email&#160;protected]</a></li>
                         <li><i class="fas fa-clock"></i> Lun - Vie: 8:00 am - 5:00 pm</li>
                     </ul>
                 </div>
@@ -293,9 +294,9 @@
             <div class="modal-left">
                 <img src="https://mgx-backend-cdn.metadl.com/generate/images/986497/2026-03-12/8ef8e57d-9b08-41c6-b8ed-b08d404d6442.png" alt="Login background" class="modal-bg-img">
                 <div class="modal-left-content">
-                    <i class="fas fa-graduation-cap modal-logo-icon"></i>
+                    <i class="fas fa-water modal-logo-icon"></i>
                     <h2>Bienvenido de vuelta</h2>
-                    <p>Accede a tu cuenta para gestionar tus actividades académicas</p>
+                    <p>Accede a tu cuenta para gestionar tus actividades</p>
                 </div>
             </div>
             <div class="modal-right">
@@ -305,20 +306,20 @@
                 <div class="modal-form-wrapper">
                     <h2 class="modal-title">Iniciar Sesión</h2>
                     <p class="modal-subtitle">Ingresa tus credenciales para continuar</p>
-                    <form class="login-form" method="POST" action="/login">
+                    <form class="login-form" id="loginForm">
                         <div class="form-group">
-                            <label for="email">Correo Electrónico</label>
+                            <label for="loginEmail">Correo Electrónico</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-envelope"></i>
-                                <input type="email" name="email" id="email" placeholder="tu@correo.com" required>
+                                <input type="email" name="email" id="loginEmail" placeholder="tu@correo.com" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="password">Contraseña</label>
+                            <label for="loginPassword">Contraseña</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" name="password" id="password" placeholder="••••••••" required>
-                                <button type="button" class="toggle-password" id="togglePassword" aria-label="Mostrar contraseña">
+                                <input type="password" name="password" id="loginPassword" placeholder="••••••••" required>
+                                <button type="button" class="toggle-password" id="toggleLoginPassword" aria-label="Mostrar contraseña">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
@@ -336,13 +337,104 @@
                             <i class="fas fa-arrow-right"></i>
                         </button>
                     </form>
-                    <p class="modal-footer-text">¿No tienes cuenta? <a href="#">Regístrate aquí</a></p>
+                    <p class="modal-footer-text">¿No tienes cuenta? <a href="#" id="linkToRegister">Regístrate aquí</a></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <!-- ========== MODAL REGISTER (MEJORADO) ========== -->
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal-container">
+            <div class="modal-left">
+                <img src="https://mgx-backend-cdn.metadl.com/generate/images/986497/2026-03-12/8ef8e57d-9b08-41c6-b8ed-b08d404d6442.png" alt="Register background" class="modal-bg-img">
+                <div class="modal-left-content">
+                    <i class="fas fa-water modal-logo-icon"></i>
+                    <h2>Únete a Aquarium</h2>
+                    <p>Crea tu cuenta y forma parte de nuestra comunidad comprometida con el agua</p>
+                    <div class="modal-left-features">
+                        <div class="modal-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Acceso a convenios exclusivos</span>
+                        </div>
+                        <div class="modal-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Seguimiento de proyectos</span>
+                        </div>
+                        <div class="modal-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Comunidad activa</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-right">
+                <button class="modal-close" id="btnCloseRegister" aria-label="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="modal-form-wrapper">
+                    <h2 class="modal-title">Crear Cuenta</h2>
+                    <p class="modal-subtitle">Completa tus datos para registrarte</p>
+                    <form class="login-form" id="registerForm">
+                        <div class="form-group">
+                            <label for="regNombre">Nombre Completo</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user"></i>
+                                <input type="text" name="nombre" id="regNombre" placeholder="Tu nombre completo" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="regEmail">Correo Electrónico</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" name="email" id="regEmail" placeholder="tu@correo.com" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="regPassword">Contraseña</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" name="password" id="regPassword" placeholder="Mínimo 8 caracteres" required minlength="8">
+                                <button type="button" class="toggle-password" id="toggleRegPassword" aria-label="Mostrar contraseña">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength" id="passwordStrength">
+                                <div class="strength-bars">
+                                    <div class="strength-bar"></div>
+                                    <div class="strength-bar"></div>
+                                    <div class="strength-bar"></div>
+                                    <div class="strength-bar"></div>
+                                </div>
+                                <span class="strength-text" id="strengthText"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="regConfirmPassword">Confirmar Contraseña</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-shield-alt"></i>
+                                <input type="password" name="confirmPassword" id="regConfirmPassword" placeholder="Repite tu contraseña" required minlength="8">
+                            </div>
+                        </div>
+                        <div class="form-options">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" id="acceptTerms" required>
+                                <span class="checkmark"></span>
+                                Acepto los <a href="#" class="terms-link">términos y condiciones</a>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <span>Crear Cuenta</span>
+                            <i class="fas fa-user-plus"></i>
+                        </button>
+                    </form>
+                    <p class="modal-footer-text">¿Ya tienes cuenta? <a href="#" id="linkToLogin">Inicia sesión aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="script.js"></script>
 </body>
 
 </html>
