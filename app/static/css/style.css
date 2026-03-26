@@ -721,7 +721,7 @@ img {
     opacity: 0.6;
 }
 
-/* ========== MODAL LOGIN ========== */
+/* ========== MODAL (LOGIN & REGISTER) ========== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -761,6 +761,195 @@ img {
 
 .modal-overlay.active .modal-container {
     transform: scale(1) translateY(0);
+    animation: modalBounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes modalBounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(60px);
+    }
+    40% {
+        opacity: 1;
+        transform: scale(1.02) translateY(-8px);
+    }
+    70% {
+        transform: scale(0.98) translateY(4px);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Modal closing animation */
+.modal-overlay.closing .modal-container {
+    animation: modalSlideOut 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes modalSlideOut {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.9) translateY(40px);
+    }
+}
+
+/* Sequential field animations */
+.modal-overlay.active .form-group,
+.modal-overlay.active .form-options,
+.modal-overlay.active .login-form .btn,
+.modal-overlay.active .modal-footer-text,
+.modal-overlay.active .modal-title,
+.modal-overlay.active .modal-subtitle {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fieldFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.modal-overlay.active .modal-title {
+    animation-delay: 0.15s;
+}
+
+.modal-overlay.active .modal-subtitle {
+    animation-delay: 0.25s;
+}
+
+.modal-overlay.active .form-group:nth-child(1) {
+    animation-delay: 0.35s;
+}
+
+.modal-overlay.active .form-group:nth-child(2) {
+    animation-delay: 0.45s;
+}
+
+.modal-overlay.active .form-group:nth-child(3) {
+    animation-delay: 0.55s;
+}
+
+.modal-overlay.active .form-group:nth-child(4) {
+    animation-delay: 0.65s;
+}
+
+.modal-overlay.active .form-options {
+    animation-delay: 0.7s;
+}
+
+.modal-overlay.active .login-form .btn {
+    animation-delay: 0.8s;
+}
+
+.modal-overlay.active .modal-footer-text {
+    animation-delay: 0.9s;
+}
+
+@keyframes fieldFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Left panel animation */
+.modal-overlay.active .modal-left-content {
+    opacity: 0;
+    animation: leftPanelFadeIn 0.7s ease 0.3s forwards;
+}
+
+@keyframes leftPanelFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Left panel features staggered animation */
+.modal-overlay.active .modal-feature {
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: featureFadeIn 0.4s ease forwards;
+}
+
+.modal-overlay.active .modal-feature:nth-child(1) {
+    animation-delay: 0.6s;
+}
+
+.modal-overlay.active .modal-feature:nth-child(2) {
+    animation-delay: 0.75s;
+}
+
+.modal-overlay.active .modal-feature:nth-child(3) {
+    animation-delay: 0.9s;
+}
+
+@keyframes featureFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Logo icon pulse animation */
+.modal-overlay.active .modal-logo-icon {
+    animation: logoPulse 0.8s ease 0.4s forwards;
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+@keyframes logoPulse {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) rotate(-10deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.15) rotate(5deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+/* Input focus ripple effect */
+.input-wrapper input:focus {
+    animation: inputFocusRipple 0.4s ease;
+}
+
+@keyframes inputFocusRipple {
+    0% {
+        box-shadow: 0 0 0 0px rgba(79, 195, 247, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(79, 195, 247, 0.15);
+    }
+    100% {
+        box-shadow: 0 0 0 4px rgba(79, 195, 247, 0.15);
+    }
+}
+
+/* Button hover pulse */
+.login-form .btn:hover {
+    animation: btnPulse 0.4s ease;
+}
+
+@keyframes btnPulse {
+    0% { box-shadow: 0 0 0 0px rgba(79, 195, 247, 0.5); }
+    100% { box-shadow: 0 6px 20px rgba(79, 195, 247, 0.4); }
 }
 
 .modal-left {
@@ -814,11 +1003,39 @@ img {
     max-width: 280px;
 }
 
+/* Register modal left features */
+.modal-left-features {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-align: left;
+    width: 100%;
+    max-width: 260px;
+}
+
+.modal-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 400;
+    opacity: 0.95;
+}
+
+.modal-feature i {
+    font-size: 16px;
+    color: var(--primary-lighter);
+    min-width: 20px;
+}
+
 .modal-right {
     position: relative;
     padding: 48px 40px;
     display: flex;
     align-items: center;
+    overflow-y: auto;
+    max-height: 90vh;
 }
 
 .modal-close {
@@ -837,6 +1054,7 @@ img {
     font-size: 16px;
     cursor: pointer;
     transition: var(--transition);
+    z-index: 10;
 }
 
 .modal-close:hover {
@@ -906,6 +1124,16 @@ img {
     box-shadow: 0 0 0 4px rgba(79, 195, 247, 0.15);
 }
 
+.input-wrapper input.input-error {
+    border-color: #f44336;
+    box-shadow: 0 0 0 4px rgba(244, 67, 54, 0.1);
+}
+
+.input-wrapper input.input-success {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
+}
+
 .toggle-password {
     position: absolute;
     right: 14px;
@@ -953,6 +1181,15 @@ img {
     text-decoration: underline;
 }
 
+.terms-link {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.terms-link:hover {
+    text-decoration: underline;
+}
+
 .login-form .btn {
     margin-top: 8px;
     font-size: 16px;
@@ -973,6 +1210,76 @@ img {
 
 .modal-footer-text a:hover {
     text-decoration: underline;
+}
+
+/* ========== PASSWORD STRENGTH INDICATOR ========== */
+.password-strength {
+    margin-top: 10px;
+    display: none;
+}
+
+.password-strength.active {
+    display: block;
+}
+
+.strength-bars {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.strength-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 4px;
+    background: #E0E0E0;
+    transition: var(--transition);
+}
+
+.strength-bar.weak {
+    background: #f44336;
+}
+
+.strength-bar.fair {
+    background: #FF9800;
+}
+
+.strength-bar.good {
+    background: #4FC3F7;
+}
+
+.strength-bar.strong {
+    background: #4CAF50;
+}
+
+.strength-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.strength-text.weak { color: #f44336; }
+.strength-text.fair { color: #FF9800; }
+.strength-text.good { color: #4FC3F7; }
+.strength-text.strong { color: #4CAF50; }
+
+/* ========== FORM ERROR MESSAGE ========== */
+.form-error {
+    font-size: 12px;
+    color: #f44336;
+    margin-top: 6px;
+    display: none;
+    align-items: center;
+    gap: 6px;
+}
+
+.form-error.visible {
+    display: flex;
+}
+
+.form-error i {
+    font-size: 12px;
 }
 
 /* ========== RESPONSIVE ========== */
@@ -1105,5 +1412,13 @@ img {
         grid-template-columns: 1fr 1fr;
         gap: 20px;
         padding: 28px 20px;
+    }
+
+    .modal-right {
+        padding: 32px 20px;
+    }
+
+    .modal-title {
+        font-size: 24px;
     }
 }
