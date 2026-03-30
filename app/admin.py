@@ -13,6 +13,16 @@ def admin_required():
     return 'id' in session and session.get('rol') == 'administrador'
 
 
+
+# ==========================
+# DASHBOARD ADMIN
+# ==========================
+@admin.route('/dashboard')
+def dashboard_admin():
+    if not admin_required():
+        return redirect(url_for('auth.login_page'))
+
+    return render_template('admin/admin.html')
 # ==========================
 # OBTENER USUARIOS
 # ==========================
