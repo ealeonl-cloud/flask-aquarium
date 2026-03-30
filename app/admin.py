@@ -27,7 +27,7 @@ def dashboard_admin():
 # ==========================
 # OBTENER USUARIOS
 # ==========================
-@admin.route('/api/usuarios')
+@admin.route('/usuarios')
 def get_usuarios():
     if not admin_required():
         return jsonify({"error": "No autorizado"}), 403
