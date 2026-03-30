@@ -4,6 +4,41 @@ const AVATAR_URL = 'https://mgx-backend-cdn.metadl.com/generate/images/1072739/2
 let users = [];
 let chats = [];
 
+
+function initNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const pageTitle = document.getElementById('pageTitle');
+
+    const titles = {
+        dashboard: 'Dashboard',
+        users: 'Gestión de Usuarios',
+        chats: 'Monitoreo de Chats'
+    };
+
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const section = item.dataset.section;
+
+            // activar menú
+            navItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            // cambiar sección
+            document.querySelectorAll('.content-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+
+            const target = document.getElementById(`section-${section}`);
+            if (target) target.classList.add('active');
+
+            // cambiar título
+            if (pageTitle) pageTitle.textContent = titles[section];
+        });
+    });
+}
+
 // ===== API =====
 async function fetchUsers() {
     try {
