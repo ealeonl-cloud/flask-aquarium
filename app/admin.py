@@ -31,7 +31,7 @@ def get_usuarios():
             "id": str(u[0]),
             "name": u[1],
             "email": u[2],
-            "role": "admin" if u[3] == "administrador" else "cliente",
+            "role": "admin" if u[3] == "administrador" else "usuario",
             "status": "active",
             "createdAt": "2026-01-01"  # puedes mejorar esto luego
         })
