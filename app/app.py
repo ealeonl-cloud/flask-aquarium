@@ -17,6 +17,8 @@ mysql = MySQL(app)
 
 init_mysql(mysql)
 init_mysql_cliente(mysql)
+init_mysql_admin(mysql)
+
 
 app.register_blueprint(auth)
 app.register_blueprint(cliente)
