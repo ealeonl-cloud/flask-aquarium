@@ -118,13 +118,13 @@ def get_chats():
 
     cursor = mysql.connection.cursor()
     cursor.execute("""
-        SELECT 
-    sender_id,
-    receiver_id,
-    COUNT(*) as total
-FROM mensajes
-GROUP BY sender_id, receiver_id
-ORDER BY total DESC
+       SELECT 
+            LEAST(sender_id, receiver_id) as user1,
+            GREATEST(sender_id, receiver_id) as user2,
+            COUNT(*) as total
+        FROM mensajes
+        GROUP BY user1, user2
+        ORDER BY total DESC
     """)
 
     data = cursor.fetchall()
