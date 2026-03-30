@@ -1,34 +1,53 @@
 // ===== CONFIG =====
 const AVATAR_URL = 'https://mgx-backend-cdn.metadl.com/generate/images/1072739/2026-03-30/c4786dd6-5a9f-427d-bcc8-577e20f64237.png';
 
-const COLORS = [
-    '#6366f1', '#8b5cf6', '#a855f7', '#ec4899',
-    '#f43f5e', '#f59e0b', '#22c55e', '#06b6d4',
-    '#3b82f6', '#14b8a6'
-];
-
 let users = [];
 let chats = [];
 
 // ===== API =====
 async function fetchUsers() {
-    const res = await fetch('/admin/api/usuarios');
-    users = await res.json();
+    try {
+        const res = await fetch('/admin/api/usuarios');
+
+        if (!res.ok) {
+            console.error('Error backend usuarios:', res.status);
+            users = [];
+            return;
+        }
+
+        const data = await res.json();
+        console.log('USUARIOS:', data);
+
+        users = data;
+
+    } catch (error) {
+        console.error('Error cargando usuarios:', error);
+        users = [];
+    }
 }
 
 async function fetchChats() {
-    const res = await fetch('/admin/api/chats');
-    chats = await res.json();
+    try {
+        const res = await fetch('/admin/api/chats');
+
+        if (!res.ok) {
+            console.error('Error backend chats:', res.status);
+            chats = [];
+            return;
+        }
+
+        const data = await res.json();
+        console.log('CHATS:', data);
+
+        chats = data;
+
+    } catch (error) {
+        console.error('Error cargando chats:', error);
+        chats = [];
+    }
 }
 
 // ===== DOM =====
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebarOverlay');
-const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-const navItems = document.querySelectorAll('.nav-item');
-const pageTitle = document.getElementById('pageTitle');
-const headerDate = document.getElementById('headerDate');
-
 const statTotalUsers = document.getElementById('statTotalUsers');
 const statTotalAdmins = document.getElementById('statTotalAdmins');
 const statTotalChats = document.getElementById('statTotalChats');
@@ -39,7 +58,6 @@ const usersEmptyState = document.getElementById('usersEmptyState');
 const usersTable = document.getElementById('usersTable');
 
 const chatsBarChart = document.getElementById('chatsBarChart');
-const dashboardChart = document.getElementById('dashboardChart');
 const chatsRankingList = document.getElementById('chatsRankingList');
 
 const modalCreateUser = document.getElementById('modalCreateUser');
@@ -49,30 +67,16 @@ const modalLogout = document.getElementById('modalLogout');
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', async function () {
-    initDate();
 
     await fetchUsers();
     await fetchChats();
 
     updateStats();
     renderUsersTable();
-    renderChatsChart(chatsBarChart);
-    renderChatsChart(dashboardChart);
+    renderChatsChart();
     renderChatsRanking();
-    renderRecentUsers();
-
-    initNavigation();
     initModals();
-    initMobileMenu();
 });
-
-// ===== DATE =====
-function initDate() {
-    const now = new Date();
-    headerDate.textContent = now.toLocaleDateString('es-ES', {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
-}
 
 // ===== STATS =====
 function updateStats() {
@@ -89,7 +93,7 @@ function updateStats() {
 
 // ===== USERS =====
 function renderUsersTable() {
-    if (users.length === 0) {
+    if (!users || users.length === 0) {
         usersTable.style.display = 'none';
         usersEmptyState.style.display = 'flex';
         return;
@@ -103,8 +107,12 @@ function renderUsersTable() {
             <td><img src="${AVATAR_URL}" class="user-avatar-sm"></td>
             <td>${user.name}</td>
             <td>${user.email}</td>
-            <td><span class="badge badge-admin">Admin</span></td>
-            <td>${user.createdAt}</td>
+            <td>
+                <span class="badge ${user.role === 'admin' ? 'badge-admin' : 'badge-user'}">
+                    ${user.role === 'admin' ? 'Admin' : 'Usuario'}
+                </span>
+            </td>
+            <td>${user.createdAt || '—'}</td>
             <td><span class="badge badge-active">Activo</span></td>
             <td>
                 <button onclick="openEditModal('${user.id}')">Editar</button>
@@ -163,10 +171,10 @@ async function handleDeleteUser() {
 }
 
 // ===== CHATS =====
-function renderChatsChart(container) {
-    const sorted = [...chats].sort((a, b) => b.interactions - a.interactions);
+function renderChatsChart() {
+    if (!chats || chats.length === 0) return;
 
-    container.innerHTML = sorted.map(c => `
+    chatsBarChart.innerHTML = chats.map(c => `
         <div style="margin:5px">
             <div style="background:#6366f1;height:${c.interactions}px;width:20px"></div>
             <small>${c.name}</small>
@@ -188,7 +196,7 @@ function initModals() {
 
     document.getElementById('btnLogout').addEventListener('click', () => openModal(modalLogout));
     document.getElementById('btnConfirmLogout').addEventListener('click', () => {
-        window.location.href = "/admin/logout";
+        window.location.href = "/logout";
     });
 }
 
@@ -214,21 +222,6 @@ window.openDeleteModal = function (id) {
 function refreshAll() {
     updateStats();
     renderUsersTable();
-    renderChatsChart(chatsBarChart);
+    renderChatsChart();
     renderChatsRanking();
-}
-
-function initNavigation() {
-    navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const section = item.dataset.section;
-            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            document.getElementById(`section-${section}`).classList.add('active');
-        });
-    });
-}
-
-function initMobileMenu() {
-    mobileMenuBtn.addEventListener('click', () => sidebar.classList.add('open'));
-    sidebarOverlay.addEventListener('click', () => sidebar.classList.remove('open'));
 }
