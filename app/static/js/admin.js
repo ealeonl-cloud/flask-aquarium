@@ -4,7 +4,54 @@ const AVATAR_URL = 'https://mgx-backend-cdn.metadl.com/generate/images/1072739/2
 let users = [];
 let chats = [];
 
+// ===== DOM =====
+const statTotalUsers = document.getElementById('statTotalUsers');
+const statTotalAdmins = document.getElementById('statTotalAdmins');
+const statTotalChats = document.getElementById('statTotalChats');
+const statTodayInteractions = document.getElementById('statTodayInteractions');
 
+const usersTableBody = document.getElementById('usersTableBody');
+const usersEmptyState = document.getElementById('usersEmptyState');
+const usersTable = document.getElementById('usersTable');
+
+const chatsBarChart = document.getElementById('chatsBarChart');
+const dashboardChart = document.getElementById('dashboardChart');
+const chatsRankingList = document.getElementById('chatsRankingList');
+
+const modalCreateUser = document.getElementById('modalCreateUser');
+const modalEditUser = document.getElementById('modalEditUser');
+const modalDeleteUser = document.getElementById('modalDeleteUser');
+const modalLogout = document.getElementById('modalLogout');
+
+// ===== FORM ELEMENTS =====
+const inputUserName = document.getElementById('inputUserName');
+const inputUserEmail = document.getElementById('inputUserEmail');
+const inputUserPassword = document.getElementById('inputUserPassword');
+
+const editUserId = document.getElementById('editUserId');
+const inputEditName = document.getElementById('inputEditName');
+
+const deleteUserId = document.getElementById('deleteUserId');
+
+const formCreateUser = document.getElementById('formCreateUser');
+const formEditUser = document.getElementById('formEditUser');
+
+const btnConfirmDelete = document.getElementById('btnConfirmDelete');
+const btnLogout = document.getElementById('btnLogout');
+const btnConfirmLogout = document.getElementById('btnConfirmLogout');
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', async () => {
+
+    await fetchUsers();
+    await fetchChats();
+
+    renderAll();
+    initNavigation();
+    initModals();
+});
+
+// ===== NAVIGATION =====
 function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
     const pageTitle = document.getElementById('pageTitle');
@@ -21,11 +68,9 @@ function initNavigation() {
 
             const section = item.dataset.section;
 
-            // activar menú
             navItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
 
-            // cambiar sección
             document.querySelectorAll('.content-section').forEach(sec => {
                 sec.classList.remove('active');
             });
@@ -33,7 +78,6 @@ function initNavigation() {
             const target = document.getElementById(`section-${section}`);
             if (target) target.classList.add('active');
 
-            // cambiar título
             if (pageTitle) pageTitle.textContent = titles[section];
         });
     });
@@ -68,36 +112,7 @@ async function fetchChats() {
     }
 }
 
-// ===== DOM =====
-const statTotalUsers = document.getElementById('statTotalUsers');
-const statTotalAdmins = document.getElementById('statTotalAdmins');
-const statTotalChats = document.getElementById('statTotalChats');
-const statTodayInteractions = document.getElementById('statTodayInteractions');
-
-const usersTableBody = document.getElementById('usersTableBody');
-const usersEmptyState = document.getElementById('usersEmptyState');
-const usersTable = document.getElementById('usersTable');
-
-const chatsBarChart = document.getElementById('chatsBarChart');
-const dashboardChart = document.getElementById('dashboardChart');
-const chatsRankingList = document.getElementById('chatsRankingList');
-
-const modalCreateUser = document.getElementById('modalCreateUser');
-const modalEditUser = document.getElementById('modalEditUser');
-const modalDeleteUser = document.getElementById('modalDeleteUser');
-const modalLogout = document.getElementById('modalLogout');
-
-// ===== INIT =====
-document.addEventListener('DOMContentLoaded', async () => {
-
-    await fetchUsers();
-    await fetchChats();
-
-    renderAll();
-    initModals();
-});
-
-// ===== RENDER GLOBAL =====
+// ===== RENDER =====
 function renderAll() {
     updateStats();
     renderUsersTable();
@@ -193,7 +208,7 @@ async function reloadUsers() {
 
 // ===== CHATS =====
 function renderChatsChart(container) {
-    if (!chats.length) return;
+    if (!chats.length || !container) return;
 
     const sorted = [...chats].sort((a, b) => b.interactions - a.interactions);
     const max = Math.max(...sorted.map(c => c.interactions));
@@ -220,11 +235,16 @@ function renderChatsRanking() {
 
 // ===== MODALS =====
 function initModals() {
+
     formCreateUser.addEventListener('submit', handleCreateUser);
     formEditUser.addEventListener('submit', handleEditUser);
     btnConfirmDelete.addEventListener('click', handleDeleteUser);
 
+    document.getElementById('btnCreateUser')
+        .addEventListener('click', () => openModal(modalCreateUser));
+
     btnLogout.addEventListener('click', () => openModal(modalLogout));
+
     btnConfirmLogout.addEventListener('click', () => {
         window.location.href = "/logout";
     });
@@ -238,12 +258,23 @@ function closeModal(modal) {
     modal.classList.remove('active');
 }
 
+// ===== GLOBAL MODALS =====
 window.openEditModal = function (id) {
+    const user = users.find(u => u.id == id);
+    if (!user) return;
+
     editUserId.value = id;
+    inputEditName.value = user.name;
+
     openModal(modalEditUser);
 };
 
 window.openDeleteModal = function (id) {
+    const user = users.find(u => u.id == id);
+    if (!user) return;
+
     deleteUserId.value = id;
+    document.getElementById('deleteUserName').textContent = user.name;
+
     openModal(modalDeleteUser);
 };
