@@ -34,7 +34,7 @@ def get_usuarios():
 
     cursor = mysql.connection.cursor()
     cursor.execute("""
-        SELECT id, nombre, usuario, rol, fecha_creacion
+        SELECT id, nombre, email, rol, fecha_creacion
         FROM usuarios
     """)
 
