@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderAll();
     initNavigation();
     initModals();
-    initModalClosers();
+    
 });
 
 // ===== NAVIGATION =====
@@ -255,6 +255,10 @@ function initModals() {
     formCreateUser.addEventListener('submit', handleCreateUser);
     formEditUser.addEventListener('submit', handleEditUser);
     btnConfirmDelete.addEventListener('click', handleDeleteUser);
+
+    document.getElementById('btnCancelCreate').addEventListener('click', () => {
+        closeModal(modalCreateUser);
+    });
 
     document.getElementById('btnCreateUser')
         .addEventListener('click', () => openModal(modalCreateUser));
