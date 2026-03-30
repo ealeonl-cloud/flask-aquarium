@@ -1,5 +1,4 @@
-from flask import Blueprint, request, jsonify, session
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Blueprint, request, jsonify, session, render_template, redirect, url_for
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -14,7 +13,6 @@ def admin_required():
     return 'id' in session and session.get('rol') == 'administrador'
 
 
-
 # ==========================
 # DASHBOARD ADMIN
 # ==========================
@@ -24,27 +22,30 @@ def dashboard_admin():
         return redirect(url_for('auth.login_page'))
 
     return render_template('admin.html')
+
+
 # ==========================
 # OBTENER USUARIOS
 # ==========================
-@app.route("/admin/api/usuarios")
+@admin.route('/api/usuarios')
 def get_usuarios():
-    cursor = mysql.connection.cursor()
-    cursor.execute("""
-        SELECT id, name, email, created_at
-        FROM usuarios
-    """)
-    
-    data = cursor.fetchall()
+    if not admin_required():
+        return jsonify({"error": "No autorizado"}), 403
 
-    users = []
-    for row in data:
-        users.append({
-            "id": row[0],
-            "name": row[1],
-            "email": row[2],
-            "role": "admin",
-            "createdAt": str(row[3])
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT id, nombre, email, rol FROM usuarios")
+    data = cursor.fetchall()
+    cursor.close()
+
+    usuarios = []
+    for u in data:
+        usuarios.append({
+            "id": str(u[0]),
+            "name": u[1],
+            "email": u[2],
+            "role": "admin" if u[3] == "administrador" else "user",
+            "status": "active",
+            "createdAt": "2026-01-01"
         })
 
     return jsonify(usuarios)
@@ -53,49 +54,58 @@ def get_usuarios():
 # ==========================
 # CREAR ADMIN
 # ==========================
-@app.route("/admin/api/usuarios", methods=["POST"])
-def create_usuario():
-    data = request.get_json()
+@admin.route('/api/usuarios', methods=['POST'])
+def crear_usuario():
+    if not admin_required():
+        return jsonify({"error": "No autorizado"}), 403
+
+    data = request.json
 
     cursor = mysql.connection.cursor()
     cursor.execute("""
-        INSERT INTO usuarios (name, email, password)
-        VALUES (%s,%s,%s)
-    """, (data["name"], data["email"], data["password"]))
+        INSERT INTO usuarios (nombre, email, password, rol)
+        VALUES (%s, %s, %s, %s)
+    """, (data['name'], data['email'], data['password'], 'administrador'))
 
     mysql.connection.commit()
-    return {"status": "ok"}
+    cursor.close()
+
+    return jsonify({"success": True})
 
 
 # ==========================
 # EDITAR NOMBRE
 # ==========================
-@app.route("/admin/api/usuarios/<int:id>", methods=["PUT"])
-def update_usuario(id):
-    data = request.get_json()
+@admin.route('/api/usuarios/<id>', methods=['PUT'])
+def editar_usuario(id):
+    if not admin_required():
+        return jsonify({"error": "No autorizado"}), 403
+
+    data = request.json
 
     cursor = mysql.connection.cursor()
-    cursor.execute("""
-        UPDATE usuarios
-        SET name=%s
-        WHERE id=%s
-    """, (data["name"], id))
-
+    cursor.execute("UPDATE usuarios SET nombre = %s WHERE id = %s",
+                   (data['name'], id))
     mysql.connection.commit()
-    return {"status": "ok"}
+    cursor.close()
+
+    return jsonify({"success": True})
 
 
 # ==========================
 # ELIMINAR USUARIO
 # ==========================
 @admin.route('/api/usuarios/<id>', methods=['DELETE'])
-@app.route("/admin/api/usuarios/<int:id>", methods=["DELETE"])
-def delete_usuario(id):
-    cursor = mysql.connection.cursor()
-    cursor.execute("DELETE FROM usuarios WHERE id=%s", (id,))
-    mysql.connection.commit()
+def eliminar_usuario(id):
+    if not admin_required():
+        return jsonify({"error": "No autorizado"}), 403
 
-    return {"status": "ok"}
+    cursor = mysql.connection.cursor()
+    cursor.execute("DELETE FROM usuarios WHERE id = %s", (id,))
+    mysql.connection.commit()
+    cursor.close()
+
+    return jsonify({"success": True})
 
 
 # ==========================
@@ -107,7 +117,6 @@ def get_chats():
         return jsonify([])
 
     cursor = mysql.connection.cursor()
-
     cursor.execute("""
         SELECT chat_id, COUNT(*) as total
         FROM mensajes
