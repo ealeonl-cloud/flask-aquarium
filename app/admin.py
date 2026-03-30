@@ -33,7 +33,11 @@ def get_usuarios():
         return jsonify({"error": "No autorizado"}), 403
 
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT id, nombre, email, rol FROM usuarios")
+    cursor.execute("""
+        SELECT id, nombre, usuario, rol, created_at
+        FROM usuarios
+    """)
+
     data = cursor.fetchall()
     cursor.close()
 
@@ -43,9 +47,9 @@ def get_usuarios():
             "id": str(u[0]),
             "name": u[1],
             "email": u[2],
-            "role": "admin" if u[3] == "administrador" else "user",
+            "role": "admin" if u[3] == "administrador" else "usuario",
             "status": "active",
-            "createdAt": "2026-01-01"
+            "createdAt": u[4].strftime('%Y-%m-%d') if u[4] else None
         })
 
     return jsonify(usuarios)
