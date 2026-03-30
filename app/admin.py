@@ -23,7 +23,7 @@ def dashboard_admin():
     if not admin_required():
         return redirect(url_for('auth.login_page'))
 
-    return render_template('admin/admin.html')
+    return render_template('admin.html')
 # ==========================
 # OBTENER USUARIOS
 # ==========================
