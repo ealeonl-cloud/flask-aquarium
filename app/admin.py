@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request
+from flask import Blueprint, request, jsonify, session
 
-admin = Blueprint('admin', __name__)
+admin = Blueprint('admin', __name__, url_prefix='/admin')
 
 mysql = None
 
@@ -9,83 +9,119 @@ def init_mysql(db):
     mysql = db
 
 
-@admin.route('/admin')
-def dashboard_admin():
-
-    if 'id' not in session:
-        return redirect(url_for('auth.login_page'))
-
-    if session['rol'] != 'administrador':
-        return redirect(url_for('dashboard'))
-
-    return render_template("admin.html")
-
-    
+def admin_required():
+    return 'id' in session and session.get('rol') == 'administrador'
 
 
-@admin.route('/admin/chats')
-def ver_chats():
-
-    if 'id' not in session:
-        return redirect(url_for('auth.login_page'))
-
-    if session['rol'] != 'administrador':
-        return redirect(url_for('dashboard'))
+# ==========================
+# OBTENER USUARIOS
+# ==========================
+@admin.route('/api/usuarios')
+def get_usuarios():
+    if not admin_required():
+        return jsonify({"error": "No autorizado"}), 403
 
     cursor = mysql.connection.cursor()
+    cursor.execute("SELECT id, nombre, usuario, rol FROM usuarios")
+    data = cursor.fetchall()
 
-    cursor.execute("""
-        SELECT c.id, u.nombre, c.convenio_id, c.estado, c.fecha
-        FROM chats c
-        JOIN usuarios u ON c.usuario_id = u.id
-        ORDER BY c.fecha DESC
-    """)
+    usuarios = []
+    for u in data:
+        usuarios.append({
+            "id": str(u[0]),
+            "name": u[1],
+            "email": u[2],
+            "role": "admin" if u[3] == "administrador" else "cliente",
+            "status": "active",
+            "createdAt": "2026-01-01"  # puedes mejorar esto luego
+        })
 
-    chats = cursor.fetchall()
+    return jsonify(usuarios)
 
-    cursor.close()
 
-    return render_template("admin.html", chats=chats)
+# ==========================
+# CREAR ADMIN
+# ==========================
+@admin.route('/api/usuarios', methods=['POST'])
+def crear_usuario():
+    if not admin_required():
+        return jsonify({"error": "No autorizado"}), 403
 
-@admin.route('/admin/chat/<int:chat_id>')
-def ver_chat(chat_id):
-
-    if 'id' not in session:
-        return redirect(url_for('auth.login_page'))
-
-    cursor = mysql.connection.cursor()
-
-    cursor.execute("""
-        SELECT remitente, mensaje, fecha
-        FROM mensajes
-        WHERE chat_id = %s
-        ORDER BY fecha ASC
-    """, (chat_id,))
-
-    mensajes = cursor.fetchall()
-
-    cursor.close()
-
-    return {"mensajes": mensajes}
-
-@admin.route('/admin/mensaje', methods=['POST'])
-def responder_mensaje():
-
-    if 'id' not in session:
-        return {"error": "No autorizado"}, 401
-
-    chat_id = request.form['chat_id']
-    mensaje = request.form['mensaje']
+    data = request.json
 
     cursor = mysql.connection.cursor()
-
     cursor.execute("""
-        INSERT INTO mensajes (chat_id, remitente, mensaje)
-        VALUES (%s,'convenio',%s)
-    """, (chat_id, mensaje))
+        INSERT INTO usuarios (nombre, usuario, password, rol)
+        VALUES (%s, %s, %s, %s)
+    """, (data['name'], data['email'], data['password'], 'administrador'))
 
     mysql.connection.commit()
 
+    return jsonify({"success": True})
+
+
+# ==========================
+# EDITAR NOMBRE
+# ==========================
+@admin.route('/api/usuarios/<id>', methods=['PUT'])
+def editar_usuario(id):
+    if not admin_required():
+        return jsonify({"error": "No autorizado"}), 403
+
+    data = request.json
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("UPDATE usuarios SET nombre = %s WHERE id = %s",
+                   (data['name'], id))
+    mysql.connection.commit()
+
+    return jsonify({"success": True})
+
+
+# ==========================
+# ELIMINAR USUARIO
+# ==========================
+@admin.route('/api/usuarios/<id>', methods=['DELETE'])
+def eliminar_usuario(id):
+    if not admin_required():
+        return jsonify({"error": "No autorizado"}), 403
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("DELETE FROM usuarios WHERE id = %s", (id,))
+    mysql.connection.commit()
+
+    return jsonify({"success": True})
+
+
+# ==========================
+# CHATS (TOP INTERACCIONES)
+# ==========================
+@admin.route('/api/chats')
+def get_chats():
+    if not admin_required():
+        return jsonify([])
+
+    cursor = mysql.connection.cursor()
+
+    cursor.execute("""
+        SELECT chat_id, COUNT(*) as total
+        FROM mensajes
+        GROUP BY chat_id
+        ORDER BY total DESC
+    """)
+
+    data = cursor.fetchall()
+
+    chats = []
+    for c in data:
+        chats.append({
+            "id": str(c[0]),
+            "name": f"Chat {c[0]}",
+            "interactions": c[1],
+            "lastActive": "2026-03-30"
+        })
+
+    return jsonify(chats)
     cursor.close()
 
     return {"status": "ok"}
