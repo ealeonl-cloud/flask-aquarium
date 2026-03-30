@@ -53,7 +53,7 @@ def get_usuarios():
 # ==========================
 # CREAR ADMIN
 # ==========================
-@admin.route('/api/usuarios', methods=['POST'])
+@admin.route('/usuarios', methods=['POST'])
 def crear_usuario():
     if not admin_required():
         return jsonify({"error": "No autorizado"}), 403
