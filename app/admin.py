@@ -27,24 +27,24 @@ def dashboard_admin():
 # ==========================
 # OBTENER USUARIOS
 # ==========================
-@admin.route('/usuarios')
+@app.route("/admin/api/usuarios")
 def get_usuarios():
-    if not admin_required():
-        return jsonify({"error": "No autorizado"}), 403
-
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT id, nombre, usuario, rol FROM usuarios")
+    cursor.execute("""
+        SELECT id, name, email, created_at
+        FROM usuarios
+    """)
+    
     data = cursor.fetchall()
 
-    usuarios = []
-    for u in data:
-        usuarios.append({
-            "id": str(u[0]),
-            "name": u[1],
-            "email": u[2],
-            "role": "admin" if u[3] == "administrador" else "usuario",
-            "status": "active",
-            "createdAt": "2026-01-01"  # puedes mejorar esto luego
+    users = []
+    for row in data:
+        users.append({
+            "id": row[0],
+            "name": row[1],
+            "email": row[2],
+            "role": "admin",
+            "createdAt": str(row[3])
         })
 
     return jsonify(usuarios)
@@ -53,55 +53,49 @@ def get_usuarios():
 # ==========================
 # CREAR ADMIN
 # ==========================
-@admin.route('/usuarios', methods=['POST'])
-def crear_usuario():
-    if not admin_required():
-        return jsonify({"error": "No autorizado"}), 403
-
-    data = request.json
+@app.route("/admin/api/usuarios", methods=["POST"])
+def create_usuario():
+    data = request.get_json()
 
     cursor = mysql.connection.cursor()
     cursor.execute("""
-        INSERT INTO usuarios (nombre, usuario, password, rol)
-        VALUES (%s, %s, %s, %s)
-    """, (data['name'], data['email'], data['password'], 'administrador'))
+        INSERT INTO usuarios (name, email, password)
+        VALUES (%s,%s,%s)
+    """, (data["name"], data["email"], data["password"]))
 
     mysql.connection.commit()
-
-    return jsonify({"success": True})
+    return {"status": "ok"}
 
 
 # ==========================
 # EDITAR NOMBRE
 # ==========================
-@admin.route('/api/usuarios/<id>', methods=['PUT'])
-def editar_usuario(id):
-    if not admin_required():
-        return jsonify({"error": "No autorizado"}), 403
-
-    data = request.json
+@app.route("/admin/api/usuarios/<int:id>", methods=["PUT"])
+def update_usuario(id):
+    data = request.get_json()
 
     cursor = mysql.connection.cursor()
-    cursor.execute("UPDATE usuarios SET nombre = %s WHERE id = %s",
-                   (data['name'], id))
-    mysql.connection.commit()
+    cursor.execute("""
+        UPDATE usuarios
+        SET name=%s
+        WHERE id=%s
+    """, (data["name"], id))
 
-    return jsonify({"success": True})
+    mysql.connection.commit()
+    return {"status": "ok"}
 
 
 # ==========================
 # ELIMINAR USUARIO
 # ==========================
 @admin.route('/api/usuarios/<id>', methods=['DELETE'])
-def eliminar_usuario(id):
-    if not admin_required():
-        return jsonify({"error": "No autorizado"}), 403
-
+@app.route("/admin/api/usuarios/<int:id>", methods=["DELETE"])
+def delete_usuario(id):
     cursor = mysql.connection.cursor()
-    cursor.execute("DELETE FROM usuarios WHERE id = %s", (id,))
+    cursor.execute("DELETE FROM usuarios WHERE id=%s", (id,))
     mysql.connection.commit()
 
-    return jsonify({"success": True})
+    return {"status": "ok"}
 
 
 # ==========================
@@ -122,6 +116,7 @@ def get_chats():
     """)
 
     data = cursor.fetchall()
+    cursor.close()
 
     chats = []
     for c in data:
@@ -133,6 +128,3 @@ def get_chats():
         })
 
     return jsonify(chats)
-    cursor.close()
-
-    return {"status": "ok"}
