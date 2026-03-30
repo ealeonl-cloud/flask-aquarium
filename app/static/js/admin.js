@@ -8,20 +8,13 @@ let chats = [];
 async function fetchUsers() {
     try {
         const res = await fetch('/admin/api/usuarios');
+        if (!res.ok) throw new Error(res.status);
 
-        if (!res.ok) {
-            console.error('Error backend usuarios:', res.status);
-            users = [];
-            return;
-        }
+        users = await res.json();
+        console.log("USERS:", users);
 
-        const data = await res.json();
-        console.log('USUARIOS:', data);
-
-        users = data;
-
-    } catch (error) {
-        console.error('Error cargando usuarios:', error);
+    } catch (err) {
+        console.error("Error usuarios:", err);
         users = [];
     }
 }
@@ -29,20 +22,13 @@ async function fetchUsers() {
 async function fetchChats() {
     try {
         const res = await fetch('/admin/api/chats');
+        if (!res.ok) throw new Error(res.status);
 
-        if (!res.ok) {
-            console.error('Error backend chats:', res.status);
-            chats = [];
-            return;
-        }
+        chats = await res.json();
+        console.log("CHATS:", chats);
 
-        const data = await res.json();
-        console.log('CHATS:', data);
-
-        chats = data;
-
-    } catch (error) {
-        console.error('Error cargando chats:', error);
+    } catch (err) {
+        console.error("Error chats:", err);
         chats = [];
     }
 }
@@ -58,6 +44,7 @@ const usersEmptyState = document.getElementById('usersEmptyState');
 const usersTable = document.getElementById('usersTable');
 
 const chatsBarChart = document.getElementById('chatsBarChart');
+const dashboardChart = document.getElementById('dashboardChart');
 const chatsRankingList = document.getElementById('chatsRankingList');
 
 const modalCreateUser = document.getElementById('modalCreateUser');
@@ -66,34 +53,35 @@ const modalDeleteUser = document.getElementById('modalDeleteUser');
 const modalLogout = document.getElementById('modalLogout');
 
 // ===== INIT =====
-document.addEventListener('DOMContentLoaded', async function () {
+document.addEventListener('DOMContentLoaded', async () => {
 
     await fetchUsers();
     await fetchChats();
 
-    updateStats();
-    renderUsersTable();
-    renderChatsChart();
-    renderChatsRanking();
+    renderAll();
     initModals();
 });
 
+// ===== RENDER GLOBAL =====
+function renderAll() {
+    updateStats();
+    renderUsersTable();
+    renderChatsChart(chatsBarChart);
+    renderChatsChart(dashboardChart);
+    renderChatsRanking();
+}
+
 // ===== STATS =====
 function updateStats() {
-    const totalUsers = users.length;
-    const totalAdmins = users.filter(u => u.role === 'admin').length;
-    const totalChats = chats.length;
-    const todayInteractions = chats.reduce((sum, c) => sum + c.interactions, 0);
-
-    statTotalUsers.textContent = totalUsers;
-    statTotalAdmins.textContent = totalAdmins;
-    statTotalChats.textContent = totalChats;
-    statTodayInteractions.textContent = todayInteractions;
+    statTotalUsers.textContent = users.length;
+    statTotalAdmins.textContent = users.filter(u => u.role === 'admin').length;
+    statTotalChats.textContent = chats.length;
+    statTodayInteractions.textContent = chats.reduce((sum, c) => sum + c.interactions, 0);
 }
 
 // ===== USERS =====
 function renderUsersTable() {
-    if (!users || users.length === 0) {
+    if (!users.length) {
         usersTable.style.display = 'none';
         usersEmptyState.style.display = 'flex';
         return;
@@ -107,12 +95,8 @@ function renderUsersTable() {
             <td><img src="${AVATAR_URL}" class="user-avatar-sm"></td>
             <td>${user.name}</td>
             <td>${user.email}</td>
-            <td>
-                <span class="badge ${user.role === 'admin' ? 'badge-admin' : 'badge-user'}">
-                    ${user.role === 'admin' ? 'Admin' : 'Usuario'}
-                </span>
-            </td>
-            <td>${user.createdAt || '—'}</td>
+            <td><span class="badge badge-admin">Admin</span></td>
+            <td>${user.createdAt || '-'}</td>
             <td><span class="badge badge-active">Activo</span></td>
             <td>
                 <button onclick="openEditModal('${user.id}')">Editar</button>
@@ -126,9 +110,9 @@ function renderUsersTable() {
 async function handleCreateUser(e) {
     e.preventDefault();
 
-    const name = document.getElementById('inputUserName').value;
-    const email = document.getElementById('inputUserEmail').value;
-    const password = document.getElementById('inputUserPassword').value;
+    const name = inputUserName.value;
+    const email = inputUserEmail.value;
+    const password = inputUserPassword.value;
 
     await fetch('/admin/api/usuarios', {
         method: 'POST',
@@ -136,16 +120,15 @@ async function handleCreateUser(e) {
         body: JSON.stringify({ name, email, password })
     });
 
-    await fetchUsers();
-    refreshAll();
+    await reloadUsers();
     closeModal(modalCreateUser);
 }
 
 async function handleEditUser(e) {
     e.preventDefault();
 
-    const id = document.getElementById('editUserId').value;
-    const name = document.getElementById('inputEditName').value;
+    const id = editUserId.value;
+    const name = inputEditName.value;
 
     await fetch(`/admin/api/usuarios/${id}`, {
         method: 'PUT',
@@ -153,49 +136,61 @@ async function handleEditUser(e) {
         body: JSON.stringify({ name })
     });
 
-    await fetchUsers();
-    refreshAll();
+    await reloadUsers();
     closeModal(modalEditUser);
 }
 
 async function handleDeleteUser() {
-    const id = document.getElementById('deleteUserId').value;
+    const id = deleteUserId.value;
 
     await fetch(`/admin/api/usuarios/${id}`, {
         method: 'DELETE'
     });
 
-    await fetchUsers();
-    refreshAll();
+    await reloadUsers();
     closeModal(modalDeleteUser);
 }
 
-// ===== CHATS =====
-function renderChatsChart() {
-    if (!chats || chats.length === 0) return;
+async function reloadUsers() {
+    await fetchUsers();
+    renderAll();
+}
 
-    chatsBarChart.innerHTML = chats.map(c => `
-        <div style="margin:5px">
-            <div style="background:#6366f1;height:${c.interactions}px;width:20px"></div>
-            <small>${c.name}</small>
-        </div>
-    `).join('');
+// ===== CHATS =====
+function renderChatsChart(container) {
+    if (!chats.length) return;
+
+    const sorted = [...chats].sort((a, b) => b.interactions - a.interactions);
+    const max = Math.max(...sorted.map(c => c.interactions));
+
+    container.innerHTML = sorted.map(c => {
+        const height = (c.interactions / max) * 200;
+
+        return `
+            <div style="display:inline-block;margin:8px;text-align:center;">
+                <div style="background:#6366f1;height:${height}px;width:25px;border-radius:4px;"></div>
+                <small>${c.name}</small>
+            </div>
+        `;
+    }).join('');
 }
 
 function renderChatsRanking() {
-    chatsRankingList.innerHTML = chats.map(c => `
+    const sorted = [...chats].sort((a, b) => b.interactions - a.interactions);
+
+    chatsRankingList.innerHTML = sorted.map(c => `
         <div>${c.name} - ${c.interactions}</div>
     `).join('');
 }
 
 // ===== MODALS =====
 function initModals() {
-    document.getElementById('formCreateUser').addEventListener('submit', handleCreateUser);
-    document.getElementById('formEditUser').addEventListener('submit', handleEditUser);
-    document.getElementById('btnConfirmDelete').addEventListener('click', handleDeleteUser);
+    formCreateUser.addEventListener('submit', handleCreateUser);
+    formEditUser.addEventListener('submit', handleEditUser);
+    btnConfirmDelete.addEventListener('click', handleDeleteUser);
 
-    document.getElementById('btnLogout').addEventListener('click', () => openModal(modalLogout));
-    document.getElementById('btnConfirmLogout').addEventListener('click', () => {
+    btnLogout.addEventListener('click', () => openModal(modalLogout));
+    btnConfirmLogout.addEventListener('click', () => {
         window.location.href = "/logout";
     });
 }
@@ -209,19 +204,11 @@ function closeModal(modal) {
 }
 
 window.openEditModal = function (id) {
-    document.getElementById('editUserId').value = id;
+    editUserId.value = id;
     openModal(modalEditUser);
 };
 
 window.openDeleteModal = function (id) {
-    document.getElementById('deleteUserId').value = id;
+    deleteUserId.value = id;
     openModal(modalDeleteUser);
 };
-
-// ===== UTILS =====
-function refreshAll() {
-    updateStats();
-    renderUsersTable();
-    renderChatsChart();
-    renderChatsRanking();
-}
