@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderAll();
     initNavigation();
     initModals();
+    initModalClosers();
 });
 
 // ===== NAVIGATION =====
@@ -262,6 +263,35 @@ function initModals() {
 
     btnConfirmLogout.addEventListener('click', () => {
         window.location.href = "/logout";
+    });
+}
+
+function initModalClosers() {
+
+    // Cerrar con botones "Cancelar" o "X"
+    document.querySelectorAll('[data-close]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modal = btn.closest('.modal');
+            if (modal) closeModal(modal);
+        });
+    });
+
+    // Cerrar haciendo click fuera del modal
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(modal);
+            }
+        });
+    });
+
+    // Cerrar con tecla ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal.active').forEach(modal => {
+                closeModal(modal);
+            });
+        }
     });
 }
 
