@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://public-frontend-cos.metadl.com/mgx/img/favicon_atoms.ico" type="image/x-icon">
+    <title>Panel de Administración</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect width="32" height="32" rx="8" fill="#6366f1"/>
+                    <path d="M10 16L14 20L22 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="sidebar-title">Admin Panel</span>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-section="dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-section="users">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span>Usuarios</span>
+            </a>
+            <a href="#" class="nav-item" data-section="chats">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Monitoreo Chats</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="admin-profile">
+                <img src="https://mgx-backend-cdn.metadl.com/generate/images/1072739/2026-03-30/c4786dd6-5a9f-427d-bcc8-577e20f64237.png" alt="Admin Avatar" class="admin-avatar">
+                <div class="admin-info">
+                    <span class="admin-name" id="currentAdminName">Administrador</span>
+                    <span class="admin-role">Super Admin</span>
+                </div>
+            </div>
+            <button class="btn-logout" id="btnLogout">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Mobile Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <div class="header-date" id="headerDate"></div>
+            </div>
+        </header>
+
+        <!-- Dashboard Section -->
+        <section class="content-section active" id="section-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-users">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Usuarios</span>
+                        <span class="stat-value" id="statTotalUsers">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-admins">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Administradores</span>
+                        <span class="stat-value" id="statTotalAdmins">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-chats">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Chats Activos</span>
+                        <span class="stat-value" id="statTotalChats">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-interactions">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Interacciones Hoy</span>
+                        <span class="stat-value" id="statTodayInteractions">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card dashboard-chart-card">
+                    <div class="card-header">
+                        <h2>Top Chats por Interacciones</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="dashboardChart"></div>
+                    </div>
+                </div>
+                <div class="card dashboard-recent-card">
+                    <div class="card-header">
+                        <h2>Usuarios Recientes</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="recent-users-list" id="recentUsersList"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Users Section -->
+        <section class="content-section" id="section-users">
+            <div class="section-header">
+                <h2>Gestión de Usuarios</h2>
+                <button class="btn btn-primary" id="btnCreateUser">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Crear Administrador
+                </button>
+            </div>
+            <div class="card">
+                <div class="table-wrapper">
+                    <table class="data-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Avatar</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Fecha Creación</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="usersEmptyState" style="display:none;">
+                    <img src="https://mgx-backend-cdn.metadl.com/generate/images/1072739/2026-03-30/ed8eb22e-db3a-4fba-8373-11c63c0a24cd.png" alt="Sin usuarios" class="empty-state-img">
+                    <p>No hay usuarios registrados aún</p>
+                    <button class="btn btn-primary" id="btnCreateUserEmpty">Crear primer administrador</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chats Monitoring Section -->
+        <section class="content-section" id="section-chats">
+            <div class="section-header">
+                <h2>Monitoreo de Chats</h2>
+                <div class="filter-group">
+                    <select class="select-filter" id="chatFilterPeriod">
+                        <option value="today">Hoy</option>
+                        <option value="week" selected>Esta Semana</option>
+                        <option value="month">Este Mes</option>
+                        <option value="all">Todo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="chats-grid">
+                <div class="card chats-chart-card">
+                    <div class="card-header">
+                        <h2>Interacciones por Chat</h2>
+                        <img src="https://mgx-backend-cdn.metadl.com/generate/images/1072739/2026-03-30/a4a97d28-fb88-453a-82d5-a013556e4e35.png" alt="Analytics" class="card-header-img">
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="chatsBarChart"></div>
+                    </div>
+                </div>
+                <div class="card chats-ranking-card">
+                    <div class="card-header">
+                        <h2>Ranking de Chats</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="ranking-list" id="chatsRankingList"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal: Create User -->
+    <div class="modal-overlay" id="modalCreateUser">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalCreateTitle">Crear Administrador</h3>
+                <button class="modal-close" id="modalCreateClose">&times;</button>
+            </div>
+            <form class="modal-body" id="formCreateUser">
+                <div class="form-group">
+                    <label for="inputUserName">Nombre completo</label>
+                    <input type="text" id="inputUserName" placeholder="Ej: Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputUserEmail">Correo electrónico</label>
+                    <input type="email" id="inputUserEmail" placeholder="Ej: juan@empresa.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputUserPassword">Contraseña</label>
+                    <input type="password" id="inputUserPassword" placeholder="Mínimo 6 caracteres" required minlength="6">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCancelCreate">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Administrador</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Edit User Name -->
+    <div class="modal-overlay" id="modalEditUser">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Editar Nombre de Usuario</h3>
+                <button class="modal-close" id="modalEditClose">&times;</button>
+            </div>
+            <form class="modal-body" id="formEditUser">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label for="inputEditName">Nuevo nombre</label>
+                    <input type="text" id="inputEditName" placeholder="Nuevo nombre" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCancelEdit">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Confirm Delete -->
+    <div class="modal-overlay" id="modalDeleteUser">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3>Confirmar Eliminación</h3>
+                <button class="modal-close" id="modalDeleteClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-warning">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    <p>¿Estás seguro de que deseas eliminar a <strong id="deleteUserName"></strong>?</p>
+                    <p class="delete-subtitle">Esta acción no se puede deshacer.</p>
+                </div>
+                <input type="hidden" id="deleteUserId">
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCancelDelete">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmDelete">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Logout Confirm -->
+    <div class="modal-overlay" id="modalLogout">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3>Cerrar Sesión</h3>
+                <button class="modal-close" id="modalLogoutClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="text-align:center; color:#94a3b8; margin-bottom:24px;">¿Estás seguro de que deseas cerrar sesión?</p>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCancelLogout">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmLogout">Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script type="module" src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+
+</html>
